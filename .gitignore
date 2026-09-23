@@ -11,3 +11,4 @@ playwright-report/
 /dist/
 .vinext/
 .wrangler/
+.neon

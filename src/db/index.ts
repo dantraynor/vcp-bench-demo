@@ -2,6 +2,7 @@ import { Pool } from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
 import * as schema from "./schema";
 import { workerDatabase } from "@/db/worker-database";
+import { requestConnection } from "./request-connection";
 
 export const LOCAL_DATABASE_URL =
   "postgresql://postgres@127.0.0.1:54329/bench_adoption";
@@ -14,19 +15,12 @@ export function createDatabase(connectionString: string, max = 5) {
   });
   return { db: drizzle(pool, { schema }), pool };
 }
-type Connection = ReturnType<typeof createDatabase>;
+export type Connection = ReturnType<typeof createDatabase>;
 const globalDb = globalThis as typeof globalThis & {
   benchConnection?: Connection;
   benchConnectionKey?: string;
 };
 function resolveDatabase() {
-  const worker = workerDatabase();
-  if (worker)
-    return {
-      connectionString: worker.connectionString,
-      // Hyperdrive already pools upstream connections. One socket per isolate is enough.
-      max: worker.hyperdrive ? 1 : 5,
-    };
   if (process.env.NODE_ENV === "production" && !process.env.DATABASE_URL)
     throw new Error("DATABASE_URL is required.");
   return {
@@ -35,6 +29,13 @@ function resolveDatabase() {
   };
 }
 export function connection() {
+  const worker = workerDatabase();
+  if (worker) {
+    // Hyperdrive pools upstream; sockets here belong to one request only.
+    return requestConnection(() =>
+      createDatabase(worker.connectionString, worker.hyperdrive ? 1 : 5),
+    );
+  }
   const database = resolveDatabase();
   const key = `${database.max}:${database.connectionString}`;
   if (!globalDb.benchConnection || globalDb.benchConnectionKey !== key) {

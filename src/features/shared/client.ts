@@ -7,14 +7,19 @@ export async function requestJson<T>(
     error: "The server did not return a valid response. Please try again.",
   }));
   if (!response.ok) {
-    const fields = body.fields as Record<string, string[]> | undefined;
+    const errorBody = body as {
+      fields?: Record<string, string[]>;
+      error?: string;
+      message?: string;
+    };
+    const fields = errorBody.fields;
     const details = fields
       ? Object.entries(fields)
           .map(([field, messages]) => `${field}: ${messages.join(" ")}`)
           .join(" ")
       : "";
     throw new Error(
-      `${body.error ?? body.message ?? "The request failed."}${details ? ` ${details}` : ""}`,
+      `${errorBody.error ?? errorBody.message ?? "The request failed."}${details ? ` ${details}` : ""}`,
     );
   }
   return body as T;
