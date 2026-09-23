@@ -4,6 +4,8 @@ A demo application with a public bench registry and an open staff workspace. Pos
 
 **This is a demonstration, not the park's live adoption system.** The seed contains 520 fictional bench locations and fictional donor records. Only the park boundary and area polygons come from official NYC Parks data. No payments or emails are sent.
 
+See the [changelog](CHANGELOG.md) for release history.
+
 ## Local development
 
 Use Node 24 (`nvm use`) and install the locked dependencies with `npm ci`.
