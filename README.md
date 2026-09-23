@@ -20,7 +20,6 @@ scripts/                  Migrate, seed, refresh geography
 tests/                    Unit, real-database integration, and browser tests
 ```
 
-
 ```mermaid
 flowchart LR
   Public[Public map and adoption form] --> API[Next.js route handlers]
@@ -32,10 +31,10 @@ flowchart LR
   DB --> Audit[Audit history]
 ```
 
-The core records are **bench**, **donor**, and **adoption**. A donor can adopt multiple benches over time; a bench can have many historical adoptions. Public credit belongs to each adoption, so changing a contact's name does not silently rewrite earlier dedications. Bench codes are permanent identifiers. Cancellation and retirement preserve records instead of deleting them.    
+The core records are **bench**, **donor**, and **adoption**. A donor can adopt multiple benches over time; a bench can have many historical adoptions. Public credit belongs to each adoption, so changing a contact's name does not silently rewrite earlier dedications. Bench codes are permanent identifiers. Cancellation and retirement preserve records instead of deleting them.
 
 ## Geography sources
 
-The checked-in geometry was retrieved from [NYC Parks Properties](https://data.cityofnewyork.us/Recreation/Parks-Properties/enfh-gkve) and [NYC Parks Zones](https://data.cityofnewyork.us/City-Government/Parks-Zones/4j29-i5ry), filtered to `gispropnum='X092' AND retired=false`. 
+The checked-in geometry was retrieved from [NYC Parks Properties](https://data.cityofnewyork.us/Recreation/Parks-Properties/enfh-gkve) and [NYC Parks Zones](https://data.cityofnewyork.us/City-Government/Parks-Zones/4j29-i5ry), filtered to `gispropnum='X092' AND retired=false`.
 
-The map credits [OpenStreetMap contributors](https://www.openstreetmap.org/copyright). 
+The map credits [OpenStreetMap contributors](https://www.openstreetmap.org/copyright).
