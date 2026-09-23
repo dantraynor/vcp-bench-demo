@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    ports:
+      - "127.0.0.1:${BENCH_POSTGRES_PORT:-54329}:5432"
+    environment:
+      POSTGRES_DB: bench_adoption
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - bench-data:/var/lib/postgresql/data
+      - ./scripts/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d bench_adoption"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+volumes:
+  bench-data:

@@ -1,0 +1,45 @@
+name: Application checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+          POSTGRES_DB: bench_adoption_test
+        ports:
+          - 54329:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm test
+      - run: npm run build
+      - run: npm run typecheck
+      - run: node --input-type=module -e "import pg from 'pg'; const client = new pg.Client({connectionString:'postgresql://postgres@127.0.0.1:54329/postgres'}); await client.connect(); await client.query('CREATE DATABASE bench_adoption_e2e_test'); await client.end();"
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      # vinext overwrites .next/types/routes.d.ts; finish Next.js checks first.
+      - run: npm run build:vinext
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-failures
+          path: test-results/
+          retention-days: 7

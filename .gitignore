@@ -1,0 +1,13 @@
+node_modules
+.next
+.context/
+.env*
+.dev.vars
+coverage/
+test-results/
+playwright-report/
+*.tsbuildinfo
+.DS_Store
+/dist/
+.vinext/
+.wrangler/
